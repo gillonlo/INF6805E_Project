@@ -1,0 +1,17 @@
+
+# Executed at init time
+function init() {
+
+}
+
+# Executed every time step
+function step() {
+
+}
+
+function reset(){
+}
+
+# Execute at exit
+function destroy() {
+}
