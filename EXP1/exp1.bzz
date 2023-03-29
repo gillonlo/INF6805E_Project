@@ -25,29 +25,59 @@ POSSIBLE_STATES = {}
 POSSIBLE_STATES[0] = "succeptible"
 POSSIBLE_STATES[1] = "infected"
 
-# Executed at init time
-function init() {
+SPEED = 5.0
+
+function give_state() {
     math.rng.setseed(id)
-    rand = math.rng.uniform(0,100)
-    index = 0
+    var rand = math.rng.uniform(0,100)
+    var index = 0
     if (rand > 90) {
         index = 1
     }
-    state = POSSIBLE_STATES[index]
-    #distanceEvent = {}
+    var state = POSSIBLE_STATES[index]
+    return state
+}
+
+function random_move () {
+    sensors = {}
+    value = -1
+    var counter = 0
+    while(counter < 8) {
+        var frontValue = proximity[counter].value
+        var frontAngle = proximity[counter].angle
+        sensors[counter] = frontValue
+        counter = counter + 1
+        if (value < frontValue) {
+            value = frontValue
+        } 
+    }
+    if (sensors[2] != 0 or sensors[6] != 0 or sensors[1] != 0 or sensors[0] != 0 or sensors[7] != 0) {
+        set_wheels(SPEED,-SPEED)
+    }
+    else {
+        set_wheels(SPEED,SPEED)
+    }
+}
+
+# Executed at init time
+function init() {
+    distanceEvent = {}
     # ajoute un print obligatoire lorsque la distance est inférieure à 0.5
     #addDistanceEvent(0.5,function(rid,data){
     #    print("distance 0.5")
     #},function(rid,data){
     #    return true
     #})
-
-
+    robot_state = give_state()
+    log(robot_state)
+    s = swarm.create(1)
+    s.select(id >= 0)
 }
 
 # Executed every time step
 function step() {
-
+    s.exec(random_move)
+    log(id,"-",pose.position.x,",",pose.position.y)
 }
 
 
