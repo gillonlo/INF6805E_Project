@@ -1,6 +1,37 @@
+##################
+##### UTILS ######
+##################
+# TODO Move to ../utils.zz
+
+# robot needs a local var  distanceEvent = {} to store the distance event
+function addDistanceEvent(distance,callback,condition){
+    distanceEvent[distanceEvent.size()] = {.distance = distance, .callback=callback,.condition = condition}
+}
+
+function checkDistanceEvent(distance){
+    foreach (distanceEvent, function(key,value){
+        neighbors.foreach(function(rid, data) {
+            if(neighbors.get(rid).distance <= value.distance && value.condition(rid,data)){
+                value.callback(rid,data)
+            }
+        })
+    })
+}
+##################
+##### MAIN ######
+##################
 
 # Executed at init time
 function init() {
+
+    distanceEvent = {}
+    # ajoute un print obligatoire lorsque la distance est inférieure à 0.5
+    addDistanceEvent(0.5,function(rid,data){
+        print("distance 0.5")
+    },function(rid,data){
+        return true
+    })
+
 
 }
 
@@ -8,6 +39,8 @@ function init() {
 function step() {
 
 }
+
+
 
 function reset(){
 }
