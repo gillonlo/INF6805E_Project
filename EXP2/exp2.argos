@@ -27,7 +27,6 @@
         <range_and_bearing   implementation="medium" medium="rab"
                              show_rays="true" noise_std_dev="0" />
         <positioning         implementation="default" />
-        <kheperaiv_light      implementation="rot_z_only" show_rays="true" />
       </sensors>
             <params bytecode_file="exp2.bo"
               debug_file="exp2.bdb" />
