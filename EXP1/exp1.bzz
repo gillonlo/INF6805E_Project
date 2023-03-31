@@ -91,6 +91,21 @@ function cluster_move() {
     goto(vec.x,vec.y)
 }
 
+function cluster_move_2() {
+    current_x = pose.position.x
+    current_y = pose.position.y
+    
+    y = 4.0 - current_y
+    x = 4.0 - current_x
+    #log("truc",y,x)
+    var angle = math.atan(y,x)
+    #log("angle : ",angle)
+    angle = angle - pose.orientation.yaw
+    vec = math.vec2.newp(10.0,angle)
+    #log(vec.x,vec.y)
+    goto(vec.x,vec.y)
+}
+
 # Executed at init time
 function init() {
     distanceEvent = {}
@@ -112,7 +127,7 @@ function step() {
     var target = {}
     target.x = 0.0
     target.y = 0.0
-    s.exec(cluster_move)
+    s.exec(cluster_move_2)
     #log(pose.orientation.yaw)
     
     #log(vec.x,":",vec.y)
