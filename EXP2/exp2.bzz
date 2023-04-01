@@ -1,12 +1,24 @@
 
 # Executed at init time
 function init() {
+    s = swarm.create(0)
+    s1 = swarm.create(1)
+    s.select(id%2 == 0)
+    s1.select(id%2 == 1)
+}
 
+function print_1() {
+    log(id,":",1)
+}
+
+function print_2() {
+    log(id,":",2)
 }
 
 # Executed every time step
 function step() {
-
+    s.exec(print_1)
+    s1.exec(print_2)
 }
 
 function reset(){
