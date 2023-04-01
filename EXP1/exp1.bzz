@@ -28,6 +28,20 @@ function give_state() {
     return state
 }
 
+function save_stats(){
+
+		result_file = io.fopen("data.csv", "a")
+		io.fwrite(result_file, current_step,";",id,";", robot_state )
+		io.fclose(result_file)
+
+}
+function clear_stats(){
+result_file = io.fopen("data.csv", "w")
+io.fwrite(result_file, "step;id;state" )
+io.fclose(result_file)
+ #TODO
+}
+
 function random_move () {
     var sensors = {}
     var value = -1
@@ -81,6 +95,8 @@ function init() {
     s.select(id >= 0)
     v = stigmergy.create(1)
     v.put(string.tostring(id),index)
+    current_step = 0
+		clear_stats()
 }
 
 function edpidemics_spread() {
@@ -117,6 +133,8 @@ function step() {
     }
     s.exec(edpidemics_spread)
     set_leds(STATES_COLORS[index].r,STATES_COLORS[index].g,STATES_COLORS[index].b)
+		current_step = current_step + 1
+		save_stats()
 }
 
 function reset(){
