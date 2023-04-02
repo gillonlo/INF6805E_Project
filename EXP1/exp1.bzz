@@ -1,4 +1,10 @@
+# BRANCHING PROCESS
+
 include "vec2.bzz"
+
+PERCENT_INIT_INFECTED = 10
+PERCENT_PROBA_INFECTED = 5
+PERCENT_PROBA_INFECTED_BARRIER = 25
 
 POSSIBLE_STATES = {}
 POSSIBLE_STATES[0] = "succeptible"
@@ -8,7 +14,7 @@ STATES_COLORS = {}
 STATES_COLORS[0] = {.r = 0, .g = 255, .b = 0}
 STATES_COLORS[1] = {.r = 255, .g = 0, .b = 0}
 
-SPEED = 5.0
+SPEED = 10.0
 
 NB_CLUSTERS = 4
 CLUSTERS = {}
@@ -21,7 +27,7 @@ function give_state() {
     math.rng.setseed(id)
     var rand = math.rng.uniform(0,100)
     index = 0
-    if (rand > 90) {
+    if (rand < PERCENT_INIT_INFECTED) {
         index = 1
     }
     var state = POSSIBLE_STATES[index]
@@ -29,17 +35,17 @@ function give_state() {
 }
 
 function save_stats(){
-
+    current_step = current_step + 1
 		result_file = io.fopen("data.csv", "a")
 		io.fwrite(result_file, current_step,";",id,";", robot_state )
 		io.fclose(result_file)
 
 }
 function clear_stats(){
-result_file = io.fopen("data.csv", "w")
-io.fwrite(result_file, "step;id;state" )
-io.fclose(result_file)
- #TODO
+    result_file = io.fopen("data.csv", "w")
+    io.fwrite(result_file, "step;id;state" )
+    io.fclose(result_file)
+    #TODO
 }
 
 function random_move () {
@@ -64,6 +70,12 @@ function random_move () {
 }
 
 function cluster_move() {
+    if (change_clusters == 1) {
+        rand = math.rng.uniform(0,NB_CLUSTERS)
+        change_clusters = 0
+        steps_delay = math.rng.uniform(1,10)*10
+    }
+
     var current_x = pose.position.x
     var current_y = pose.position.y
 
@@ -75,9 +87,17 @@ function cluster_move() {
     var angle = math.atan(y,x)
     angle = angle - pose.orientation.yaw
 
-    var vec = math.vec2.newp(10.0,angle)
+    var vec = math.vec2.newp(SPEED,angle)
 
     goto(vec.x,vec.y)
+
+    var distance = distance_to_cluster()
+    if (distance < 0.5) {
+        steps_delay = steps_delay - 1
+    }   
+    if (steps_delay == 0) {
+        change_clusters = 1
+    }
 }
 
 function distance_to_cluster() {
@@ -104,36 +124,28 @@ function edpidemics_spread() {
         neighbors.foreach(function(rid, data) {
             if (data.distance < 30.0) {
                 rid_string = string.tostring(rid)
-                log(rid_string,v.get(rid_string))
                 if (v.get(rid_string) == 1) {
-                    robot_state = "infected"
-                    index = 1
-                    id_string = string.tostring(id)
-                    v.put(id_string,index)
+                    r = math.rng.uniform(0,100)
+                    if (r < PERCENT_PROBA_INFECTED) {
+                        r2 = math.rng.uniform(0,100)
+                        if (r2 < PERCENT_PROBA_INFECTED_BARRIER) {
+                            robot_state = "infected"
+                            index = 1
+                            id_string = string.tostring(id)
+                            v.put(id_string,index)
+                        }
+                    }
                 }
             }
         })
     }
+    set_leds(STATES_COLORS[index].r,STATES_COLORS[index].g,STATES_COLORS[index].b)
 }
 
 # Executed every time step
 function step() {
-    if (change_clusters == 1) {
-        rand = math.rng.uniform(0,NB_CLUSTERS)
-        change_clusters = 0
-        steps_delay = math.rng.uniform(1,10)*10
-    }
     s.exec(cluster_move)
-    var distance = distance_to_cluster()
-    if (distance < 0.5) {
-        steps_delay = steps_delay - 1
-    }   
-    if (steps_delay == 0) {
-        change_clusters = 1
-    }
     s.exec(edpidemics_spread)
-    set_leds(STATES_COLORS[index].r,STATES_COLORS[index].g,STATES_COLORS[index].b)
-		current_step = current_step + 1
 		save_stats()
 }
 
