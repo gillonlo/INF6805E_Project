@@ -1,12 +1,173 @@
+# SZR
+
+include "vec2.bzz"
+
+PERCENT_INIT_ZOMBIE = 10
+PERCENT_PROBA_INFECTED = 5
+PERCENT_PROBA_INFECTED_BARRIER = 25
+LIFE_POINTS_ZOMBIE = 100
+
+POSSIBLE_STATES = {}
+POSSIBLE_STATES[0] = "succeptible"
+POSSIBLE_STATES[1] = "zombie"
+POSSIBLE_STATES[2] = "removed"
+
+STATES_COLORS = {}
+STATES_COLORS[0] = {.r = 0, .g = 255, .b = 0}
+STATES_COLORS[1] = {.r = 255, .g = 0, .b = 0}
+STATES_COLORS[2] = {.r = 0, .g = 0, .b = 255}
+
+SPEED = 10.0
+
+NB_CLUSTERS = 4
+CLUSTERS = {}
+CLUSTERS[0] = {.x = 3.0, .y = 3.0}
+CLUSTERS[1] = {.x = 3.0, .y = -3.0}
+CLUSTERS[2] = {.x = -3.0, .y = 3.0}
+CLUSTERS[3] = {.x = -3.0, .y = -3.0}
+
+function give_state() {
+    math.rng.setseed(id)
+    var rand = math.rng.uniform(0,100)
+    index = 0
+    if (rand < PERCENT_INIT_ZOMBIE) {
+        index = 1
+        remain_life_points_zombie = LIFE_POINTS_ZOMBIE
+    }
+    var state = POSSIBLE_STATES[index]
+    return state
+}
+
+function save_stats(){
+    current_step = current_step + 1
+		result_file = io.fopen("data.csv", "a")
+		io.fwrite(result_file, current_step,";",id,";", robot_state )
+		io.fclose(result_file)
+
+}
+function clear_stats(){
+    result_file = io.fopen("data.csv", "w")
+    io.fwrite(result_file, "step;id;state" )
+    io.fclose(result_file)
+    #TODO
+}
+
+function random_move () {
+    var sensors = {}
+    var value = -1
+    var counter = 0
+    while(counter < 8) {
+        var frontValue = proximity[counter].value
+        var frontAngle = proximity[counter].angle
+        sensors[counter] = frontValue
+        counter = counter + 1
+        if (value < frontValue) {
+            value = frontValue
+        } 
+    }
+    if (sensors[2] != 0 or sensors[6] != 0 or sensors[1] != 0 or sensors[0] != 0 or sensors[7] != 0) {
+        set_wheels(SPEED,-SPEED)
+    }
+    else {
+        set_wheels(SPEED,SPEED)
+    }
+}
+
+function cluster_move() {
+    if (change_clusters == 1) {
+        rand = math.rng.uniform(0,NB_CLUSTERS)
+        change_clusters = 0
+        steps_delay = math.rng.uniform(1,10)*10
+    }
+
+    var current_x = pose.position.x
+    var current_y = pose.position.y
+
+    var target_cluster = CLUSTERS[rand]
+
+    var y = target_cluster.y - current_y
+    var x = target_cluster.x - current_x
+
+    var angle = math.atan(y,x)
+    angle = angle - pose.orientation.yaw
+
+    var vec = math.vec2.newp(SPEED,angle)
+
+    goto(vec.x,vec.y)
+
+    var distance = distance_to_cluster()
+    if (distance < 0.5) {
+        steps_delay = steps_delay - 1
+    }   
+    if (steps_delay == 0) {
+        change_clusters = 1
+    }
+}
+
+function distance_to_cluster() {
+    var current_x = pose.position.x
+    var current_y = pose.position.y
+    var target_cluster = CLUSTERS[rand]
+    return math.sqrt((current_x-target_cluster.x)^2 + (current_y-target_cluster.y)^2)
+}
 
 # Executed at init time
 function init() {
+    robot_state = give_state()
+    change_clusters = 1
+    s = swarm.create(1)
+    s.select(id >= 0)
+    v = stigmergy.create(1)
+    v.put(string.tostring(id),index)
+    current_step = 0
+		clear_stats()
+}
 
+function edpidemics_spread() {
+    if (robot_state == "zombie") {
+        neighbors.foreach(function(rid, data) {
+            if (data.distance < 30.0) {
+                rid_string = string.tostring(rid)
+                if (v.get(rid_string) == 0) {
+                    remain_life_points_zombie = remain_life_points_zombie - 1
+                }
+            }
+        })
+        if (remain_life_points_zombie <= 0) {
+            robot_state = "removed"
+            index = 2
+            id_string = string.tostring(id)
+            v.put(id_string,index)
+        }
+    }
+    else if (robot_state == "succeptible") {
+        neighbors.foreach(function(rid, data) {
+            if (data.distance < 30.0) {
+                rid_string = string.tostring(rid)
+                if (v.get(rid_string) == 1) {
+                    r = math.rng.uniform(0,100)
+                    if (r < PERCENT_PROBA_INFECTED) {
+                        r2 = math.rng.uniform(0,100)
+                        if (r2 < PERCENT_PROBA_INFECTED_BARRIER) {
+                            robot_state = "zombie"
+                            index = 1
+                            remain_life_points_zombie = LIFE_POINTS_ZOMBIE
+                            id_string = string.tostring(id)
+                            v.put(id_string,index)
+                        }
+                    }
+                }
+            }
+        })
+    }
+    set_leds(STATES_COLORS[index].r,STATES_COLORS[index].g,STATES_COLORS[index].b)
 }
 
 # Executed every time step
 function step() {
-
+    s.exec(cluster_move)
+    s.exec(edpidemics_spread)
+		save_stats()
 }
 
 function reset(){
