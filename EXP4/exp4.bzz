@@ -2,24 +2,32 @@
 
 include "vec2.bzz"
 
+# Hyperparameters for the probabilities
 PERCENT_INIT_INFECTED = 10
 PERCENT_PROBA_INFECTED = 5
 PERCENT_PROBA_INFECTED_BARRIER = 25
+
+# Time after which the robot is removed
 TIME_INFECTIOUS = 100
+# Time after which the robot is succeptible again
 TIME_REMOVED = 100
 
+# Possible states of the experiment
 POSSIBLE_STATES = {}
 POSSIBLE_STATES[0] = "succeptible"
 POSSIBLE_STATES[1] = "infected"
 POSSIBLE_STATES[2] = "removed"
 
+# Colors associated with the different states
 STATES_COLORS = {}
 STATES_COLORS[0] = {.r = 0, .g = 255, .b = 0}
 STATES_COLORS[1] = {.r = 255, .g = 0, .b = 0}
 STATES_COLORS[2] = {.r = 0, .g = 0, .b = 255}
 
+# Speed of the robots
 SPEED = 10.0
 
+# Number of clusters of meeting and position in the arena
 NB_CLUSTERS = 4
 CLUSTERS = {}
 CLUSTERS[0] = {.x = 3.0, .y = 3.0}
@@ -27,10 +35,12 @@ CLUSTERS[1] = {.x = 3.0, .y = -3.0}
 CLUSTERS[2] = {.x = -3.0, .y = 3.0}
 CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 
+# Function to give an initial state to all robots
 function give_state() {
     math.rng.setseed(id)
     var rand = math.rng.uniform(0,100)
     index = 0
+    # A certain percentage is infected at the beginning
     if (rand < PERCENT_INIT_INFECTED) {
         index = 1
         time_steps_infectious = TIME_INFECTIOUS
@@ -53,6 +63,7 @@ function clear_stats(){
     #TODO
 }
 
+# Function to move randomly the robots with obstacle avoidance
 function random_move () {
     var sensors = {}
     var value = -1
@@ -74,28 +85,33 @@ function random_move () {
     }
 }
 
+# Function to move the robots between the clusters
 function cluster_move() {
+    # At a certain time the robot decides to change the cluster
     if (change_clusters == 1) {
         rand = math.rng.uniform(0,NB_CLUSTERS)
         change_clusters = 0
+        # Steps delay staying in the cluster (with randomness)
         steps_delay = math.rng.uniform(1,10)*10
     }
 
+    # Current position of the robot
     var current_x = pose.position.x
     var current_y = pose.position.y
 
     var target_cluster = CLUSTERS[rand]
-
+    # Targeted cluster position
     var y = target_cluster.y - current_y
     var x = target_cluster.x - current_x
 
+    # Calculation of the local vector to move to the cluster
     var angle = math.atan(y,x)
     angle = angle - pose.orientation.yaw
-
     var vec = math.vec2.newp(SPEED,angle)
 
     goto(vec.x,vec.y)
 
+    # If the robot is near the cluster, the steps delay decreases
     var distance = distance_to_cluster()
     if (distance < 0.5) {
         steps_delay = steps_delay - 1
@@ -105,6 +121,7 @@ function cluster_move() {
     }
 }
 
+# Function to calculate the distance between the robot and the target cluster
 function distance_to_cluster() {
     var current_x = pose.position.x
     var current_y = pose.position.y
@@ -114,22 +131,32 @@ function distance_to_cluster() {
 
 # Executed at init time
 function init() {
+    # Give the state of the robot
     robot_state = give_state()
+    # No cluster for the moment
     change_clusters = 1
+    
     s = swarm.create(1)
     s.select(id >= 0)
+    
+    # Stigmergy to communicate the robot's state
     v = stigmergy.create(1)
     v.put(string.tostring(id),index)
+    
     current_step = 0
-		clear_stats()
+    clear_stats()
 }
 
+# Function to apply the epidemic model
 function edpidemics_spread() {
     if (robot_state == "infected") {
+        # At each step, the time left of infection decreases
         time_steps_infectious = time_steps_infectious - 1
+        # If no time left, the robot becomes removed
         if (time_steps_infectious == 0) {
             robot_state = "removed"
             index = 2
+            # Duration of remove is set
             time_steps_removed = TIME_REMOVED
             id_string = string.tostring(id)
             v.put(id_string,index)
@@ -137,12 +164,15 @@ function edpidemics_spread() {
     }
     else if (robot_state == "succeptible") {
         neighbors.foreach(function(rid, data) {
+            # If the neighbor is near the robot
             if (data.distance < 30.0) {
                 rid_string = string.tostring(rid)
+                # If the neighbor is infected there is a probability that it becomes infected
                 if (v.get(rid_string) == 1) {
                     r = math.rng.uniform(0,100)
                     if (r < PERCENT_PROBA_INFECTED) {
                         r2 = math.rng.uniform(0,100)
+                        # Second if to represent the barrier gesture to avoid infectious
                         if (r2 < PERCENT_PROBA_INFECTED_BARRIER) {
                             robot_state = "infected"
                             index = 1
@@ -156,7 +186,9 @@ function edpidemics_spread() {
         })
     }
     else if (robot_state == "removed") {
+        # If the robot is removed, at each step, we decrement the counter
         time_steps_removed = time_steps_removed - 1
+        # If no time left, the robot becomes succeptible again
         if (time_steps_removed == 0) {
             robot_state = "succeptible"
             index = 0
