@@ -1,1 +1,37 @@
+function save_stats(){
+    current_step = current_step + 1
+		result_file = io.fopen(DATA_FILE, "a")
+		io.fwrite(result_file, EXP_NAME,";",current_step,";",id,";", robot_state )
+		io.fclose(result_file)
 
+}
+function init_files(){
+
+    check_file = io.fopen(DATA_FILE, "r")
+		if(not check_file){
+			result_file = io.fopen(DATA_FILE, "w")
+    	io.fwrite(result_file, "exp;step;id;state")
+    	io.fclose(result_file)
+		}else{
+			io.fclose(check_file)
+		}
+		check_file = io.fopen(EPIDEMIC_TREE_FILE, "r")
+
+
+		if(not check_file){
+			result_file = io.fopen(EPIDEMIC_TREE_FILE, "w")
+    	io.fwrite(result_file, "exp;step;infector;infected")
+			io.fclose(result_file)
+		}else{
+    	io.fclose(check_file)
+		}	
+		
+		
+    
+
+}
+function save_infection_tree(infector){
+		result_file = io.fopen(EPIDEMIC_TREE_FILE, "a")
+		io.fwrite(result_file, EXP_NAME,";",current_step,";",infector,";", id )
+		io.fclose(result_file)
+}

@@ -1,6 +1,7 @@
 # SIS
 
 include "vec2.bzz"
+include "../utils.bzz"
 
 # Hyperparameters for the probabilities
 PERCENT_INIT_INFECTED = 10
@@ -31,6 +32,11 @@ CLUSTERS[1] = {.x = 3.0, .y = -3.0}
 CLUSTERS[2] = {.x = -3.0, .y = 3.0}
 CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 
+# data files to save
+EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
+EXP_NAME = "test"
+DATA_FILE = "data.csv"
+
 # Function to give an initial state to all robots
 function give_state() {
     math.rng.setseed(id)
@@ -40,24 +46,13 @@ function give_state() {
     if (rand < PERCENT_INIT_INFECTED) {
         index = 1
         time_steps_infectious = TIME_INFECTIOUS
+        save_infection_tree(-1)
     }
     var state = POSSIBLE_STATES[index]
     return state
 }
 
-function save_stats(){
-    current_step = current_step + 1
-		result_file = io.fopen("data.csv", "a")
-		io.fwrite(result_file, current_step,";",id,";", robot_state )
-		io.fclose(result_file)
 
-}
-function clear_stats(){
-    result_file = io.fopen("data.csv", "w")
-    io.fwrite(result_file, "step;id;state" )
-    io.fclose(result_file)
-    #TODO
-}
 
 # Function to move randomly the robots with obstacle avoidance
 function random_move () {
@@ -127,6 +122,8 @@ function distance_to_cluster() {
 
 # Executed at init time
 function init() {
+    init_files()
+    current_step = 0
     # Give the state of the robot
     robot_state = give_state()
     # No cluster for the moment
@@ -139,8 +136,7 @@ function init() {
     v = stigmergy.create(1)
     v.put(string.tostring(id),index)
     
-    current_step = 0
-    clear_stats()
+
 }
 
 # Function to apply the epidemic model
@@ -186,7 +182,7 @@ function edpidemics_spread() {
 function step() {
     s.exec(cluster_move)
     s.exec(edpidemics_spread)
-		save_stats()
+	save_stats()
 }
 
 function reset(){
