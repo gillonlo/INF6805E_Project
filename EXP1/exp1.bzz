@@ -28,6 +28,9 @@ CLUSTERS[1] = {.x = 3.0, .y = -3.0}
 CLUSTERS[2] = {.x = -3.0, .y = 3.0}
 CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 
+EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
+EXP_NAME = "test2"
+DATA_FILE = "data.csv"
 # Function to give an initial state to all robots
 function give_state() {
     math.rng.setseed(id)
@@ -36,6 +39,7 @@ function give_state() {
     # A certain percentage is infected at the beginning
     if (rand < PERCENT_INIT_INFECTED) {
         index = 1
+				save_infection_tree(-1)
     }
     var state = POSSIBLE_STATES[index]
     return state
@@ -43,16 +47,40 @@ function give_state() {
 
 function save_stats(){
     current_step = current_step + 1
-		result_file = io.fopen("data.csv", "a")
-		io.fwrite(result_file, current_step,";",id,";", robot_state )
+		result_file = io.fopen(DATA_FILE, "a")
+		io.fwrite(result_file, EXP_NAME,";",current_step,";",id,";", robot_state )
 		io.fclose(result_file)
 
 }
-function clear_stats(){
-    result_file = io.fopen("data.csv", "w")
-    io.fwrite(result_file, "step;id;state" )
-    io.fclose(result_file)
-    #TODO
+function init_files(){
+
+    check_file = io.fopen(DATA_FILE, "r")
+		if(not check_file){
+			result_file = io.fopen(DATA_FILE, "w")
+    	io.fwrite(result_file, "exp;step;id;state")
+    	io.fclose(result_file)
+		}else{
+			io.fclose(check_file)
+		}
+		check_file = io.fopen(EPIDEMIC_TREE_FILE, "r")
+
+
+		if(not check_file){
+			result_file = io.fopen(EPIDEMIC_TREE_FILE, "w")
+    	io.fwrite(result_file, "exp;step;infector;infected")
+			io.fclose(result_file)
+		}else{
+    	io.fclose(check_file)
+		}	
+		
+		
+    
+
+}
+function save_infection_tree(infector){
+		result_file = io.fopen(EPIDEMIC_TREE_FILE, "a")
+		io.fwrite(result_file, EXP_NAME,";",current_step,";",infector,";", id )
+		io.fclose(result_file)
 }
 
 # Function to move randomly the robots with obstacle avoidance
@@ -123,7 +151,8 @@ function distance_to_cluster() {
 
 # Executed at init time
 function init() {
-    # Give the state of the robot
+		init_files()
+    current_step = 0
     robot_state = give_state()
     # No cluster for the moment
     change_clusters = 1
@@ -134,9 +163,8 @@ function init() {
     # Stigmergy to communicate the robot's state
     v = stigmergy.create(1)
     v.put(string.tostring(id),index)
-    
     current_step = 0
-    clear_stats()
+		clear_stats()
 }
 
 # Function to apply the epidemic model
@@ -157,6 +185,7 @@ function edpidemics_spread() {
                             index = 1
                             id_string = string.tostring(id)
                             v.put(id_string,index)
+														save_infection_tree(rid)
                         }
                     }
                 }
@@ -168,7 +197,7 @@ function edpidemics_spread() {
 
 # Executed every time step
 function step() {
-    s.exec(cluster_move)
+    s.exec(random_move)
     s.exec(edpidemics_spread)
     save_stats()
 }
