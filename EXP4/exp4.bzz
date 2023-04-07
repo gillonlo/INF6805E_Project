@@ -13,6 +13,8 @@ TIME_INFECTIOUS = 100
 # Time after which the robot is succeptible again
 TIME_REMOVED = 100
 
+MOVE_TYPE=1
+
 # Possible states of the experiment
 POSSIBLE_STATES = {}
 POSSIBLE_STATES[0] = "succeptible"
@@ -39,7 +41,16 @@ CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 # data files to save
 EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
 EXP_NAME = "test"
-DATA_FILE = "data.csv"
+DATA_FILE = string.concat(
+	"data_",tos(NB_CLUSTERS),
+	"_",tos(toi(tos(SPEED))),
+  "_",tos(MOVE_TYPE),
+	"_",tos(PERCENT_INIT_INFECTED),
+	"_",tos(PERCENT_PROBA_INFECTED),
+	"_",tos(PERCENT_PROBA_INFECTED_BARRIER),
+	"_",tos(TIME_INFECTIOUS),
+	"_",tos(TIME_REMOVED),
+	".csv")
 
 # Function to give an initial state to all robots
 function give_state() {
@@ -196,7 +207,12 @@ function edpidemics_spread() {
 
 # Executed every time step
 function step() {
-    s.exec(cluster_move)
+		if (MOVE_TYPE){
+    	s.exec(cluster_move)
+		}
+		else{
+			s.exec(random_move)
+		}	
     s.exec(edpidemics_spread)
 		save_stats()
 }

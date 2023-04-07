@@ -5,8 +5,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
-    <experiment length="0"
+    <system threads="4" />
+    <experiment length="5000"
                 ticks_per_second="10"
                 random_seed="90" />
   </framework>

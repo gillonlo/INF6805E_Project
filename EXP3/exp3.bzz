@@ -17,6 +17,8 @@ POSSIBLE_STATES[0] = "succeptible"
 POSSIBLE_STATES[1] = "infected"
 POSSIBLE_STATES[2] = "removed"
 
+MOVE_TYPE = 1
+
 # Colors associated with the different states
 STATES_COLORS = {}
 STATES_COLORS[0] = {.r = 0, .g = 255, .b = 0}
@@ -182,7 +184,12 @@ function edpidemics_spread() {
 
 # Executed every time step
 function step() {
-    s.exec(cluster_move)
+		if (MOVE_TYPE){
+    	s.exec(cluster_move)
+		}
+		else{
+			s.exec(random_move)
+		}	
     s.exec(edpidemics_spread)
     save_stats()
 }
