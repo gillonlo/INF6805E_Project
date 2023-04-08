@@ -5,14 +5,14 @@
 ### File nomenclature
 
 Generated datasets are postfixed by the metaparameters values used in the following order : 
--`<n_clusters>` : the number of clusters
--`<speed>` : the speed of the robots
--`<move_type>` : the movement type (`0` means random, `1` means clusterized)
--`<p_i_infected>` : the initial proportion of infected agents (%)
--`<p_p_infected>` : the probability of transmitting the disease (%)
--`<p_p_i_barrier>` : the probability of resisting to an infection (%) 
--`<t_infectious>` : the time an agent remains infectious _(only for SIS and SIS)_
--`<t_removed>` : the removed time _(only for SIR)_
+- `<n_clusters>` : the number of clusters
+- `<speed>` : the speed of the robots
+- `<move_type>` : the movement type (`0` means random, `1` means clusterized)
+- `<p_i_infected>` : the initial proportion of infected agents (%)
+- `<p_p_infected>` : the probability of transmitting the disease (%)
+- `<p_p_i_barrier>` : the probability of resisting to an infection (%) 
+- `<t_infectious>` : the time an agent remains infectious _(only for SIS and SIS)_
+- `<t_removed>` : the removed time _(only for SIR)_
 
 ### Procedure for generating datasets
 
