@@ -13,6 +13,8 @@ POSSIBLE_STATES = {}
 POSSIBLE_STATES[0] = "succeptible"
 POSSIBLE_STATES[1] = "infected"
 
+MOVE_TYPE = 1
+
 # Colors associated with the different states
 STATES_COLORS = {}
 STATES_COLORS[0] = {.r = 0, .g = 255, .b = 0}
@@ -32,7 +34,14 @@ CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 # data files to save
 EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
 EXP_NAME = "test"
-DATA_FILE = "data.csv"
+DATA_FILE = string.concat(
+	"data_",tos(NB_CLUSTERS),
+	"_",tos(toi(tos(SPEED))),
+    "_",tos(MOVE_TYPE),
+	"_",tos(PERCENT_INIT_INFECTED),
+	"_",tos(PERCENT_PROBA_INFECTED),
+	"_",tos(PERCENT_PROBA_INFECTED_BARRIER),
+	".csv")
 
 # Function to give an initial state to all robots
 function give_state() {
@@ -118,7 +127,7 @@ function distance_to_cluster() {
 
 # Executed at init time
 function init() {
-	init_files()
+		init_files()
     current_step = 0
     robot_state = give_state()
     # No cluster for the moment
@@ -162,7 +171,14 @@ function edpidemics_spread() {
 
 # Executed every time step
 function step() {
-    s.exec(random_move)
+
+		if (MOVE_TYPE){
+    	s.exec(cluster_move)
+		}
+		else{
+			s.exec(random_move)
+		}		
+
     s.exec(edpidemics_spread)
     save_stats()
 }

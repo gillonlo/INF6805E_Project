@@ -35,3 +35,6 @@ function save_infection_tree(infector){
 		io.fwrite(result_file, EXP_NAME,";",current_step,";",infector,";", id )
 		io.fclose(result_file)
 }
+
+tos = string.tostring
+toi = string.toint
