@@ -9,9 +9,9 @@ PERCENT_PROBA_INFECTED = 5
 PERCENT_PROBA_INFECTED_BARRIER = 25
 
 # Time after which the robot is removed
-TIME_INFECTIOUS = 100
+TIME_INFECTIOUS = 500
 # Time after which the robot is succeptible again
-TIME_REMOVED = 100
+TIME_REMOVED = 500
 
 MOVE_TYPE=1
 

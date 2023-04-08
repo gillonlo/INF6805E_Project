@@ -3,8 +3,9 @@ import pandas as pd
 import seaborn as sns
 
 def metp2postfix(l):
+    has = lambda x:("_"+str(l.get(x,"")) if l.get(x,False) else "")
     if l:
-        return f'{l["n_clusters"]}_{l["speed"]}_{l["move_type"]}_{l["p_i_infected"]}_{l["p_p_infected"]}_{l["p_p_i_barrier"]}{"_"+str(l.get("t_infectious","")) if l.get("t_infectious",False) else ""}'
+        return f'{l["n_clusters"]}_{l["speed"]}_{l["move_type"]}_{l["p_i_infected"]}_{l["p_p_infected"]}_{l["p_p_i_barrier"]}{has("t_infectious")}{has("t_removed")}'
     return ""
 
 name2data = lambda x,b:x+"/data_"+metp2postfix(b)+".csv"
@@ -95,37 +96,39 @@ def m_plot_removed_evolution(filename, varying_parameter, list_of_mparam):
 
     #plt.xscale("log")
     #plt.yscale("log")
-    plt.title(f"Infection evolution \nfor various values of {varying_parameter}")
+    plt.title(f"Removed evolution \nfor various values of {varying_parameter}")
     plt.legend()
     plt.grid()
     plt.savefig(name2fig(filename,plot_type))
     plt.clf()
 
 
-def gen_meta_meta(varying_parameter,exclusion):
+def gen_meta_meta(varying_parameter,values,exclusion=[],default={}):
     met={
-        "n_clusters":[4],
-        "speed":[10],
-        "move_type":[1],
-        "p_i_infected":[10,20,30],
-        "p_p_infected":[5],
-        "p_p_i_barrier":[25],
-        "t_infectious":[100,250,500]
+        "n_clusters":4,
+        "speed":10,
+        "move_type":1,
+        "p_i_infected":10,
+        "p_p_infected":5,
+        "p_p_i_barrier":25,
+        "t_infectious":100,
+        "t_removed":100
     }
     l=[]
-    for x in met[varying_parameter]:
+    for x in values:
         tmp_m = {}
         for k,v in met.items():
             if k in exclusion:
                 continue
             if k!=varying_parameter:
-                tmp_m[k]=v[0]
+                tmp_m[k]=default.get(k,v)
             else:
                 tmp_m[k]=x
         l.append(tmp_m)
     return l
     
 
-#m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",["t_infectious"]))
-#m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))
-m_plot_removed_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))
+#m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",[10,20,30],["t_infectious","t_removed"]))
+#m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[100,250,500],["t_removed"]))
+#m_plot_removed_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[100,250,500],["t_removed"]))
+m_plot_infection_evolution("EXP4","t_removed",gen_meta_meta("t_removed",[100,500],default={"t_infectious":500}))
