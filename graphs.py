@@ -38,6 +38,10 @@ def craft_ds(filename,plot_type,**kwargs):
     if plot_type[:len("single_infected")]=="single_infected":
         data =pd.read_csv(name2data(filename,kwargs),delimiter=';')
         ds = draw_exp(data,"infected")
+    elif plot_type[:len("single_removed")]=="single_removed":
+        data =pd.read_csv(name2data(filename,kwargs),delimiter=';')
+        ds = draw_exp(data,"removed")
+
     return ds
 
 def lazy_load(filename,plot_type,**kwargs):
@@ -78,6 +82,25 @@ def m_plot_infection_evolution(filename, varying_parameter, list_of_mparam):
     plt.savefig(name2fig(filename,plot_type))
     plt.clf()
 
+def m_plot_removed_evolution(filename, varying_parameter, list_of_mparam):
+
+    plot_type=f"multi_removed_{varying_parameter}"
+
+    for kwargs in list_of_mparam:
+        subplot_type = "single_removed_"+metp2postfix(kwargs)
+        infected = lazy_load(filename,subplot_type,**kwargs)
+    
+        infected["nb_state"][:5000].plot(label=f"{varying_parameter}={kwargs[varying_parameter]}")
+
+
+    #plt.xscale("log")
+    #plt.yscale("log")
+    plt.title(f"Infection evolution \nfor various values of {varying_parameter}")
+    plt.legend()
+    plt.grid()
+    plt.savefig(name2fig(filename,plot_type))
+    plt.clf()
+
 
 def gen_meta_meta(varying_parameter,exclusion):
     met={
@@ -104,4 +127,5 @@ def gen_meta_meta(varying_parameter,exclusion):
     
 
 #m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",["t_infectious"]))
-m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))
+#m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))
+m_plot_removed_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))

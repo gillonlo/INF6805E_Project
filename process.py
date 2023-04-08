@@ -37,6 +37,9 @@ def craft_ds(filename,plot_type):
     if plot_type[:len("single_infected")]=="single_infected":
         data =pd.read_csv(name2data(filename),delimiter=';')
         ds = draw_exp(data,"infected")
+    elif plot_type[:len("single_removed")]=="single_removed":
+        data =pd.read_csv(name2data(filename),delimiter=';')
+        ds = draw_exp(data,"removed")
     else:
         raise Exception(f"Unrecognized plot type {plot_type}")
     return ds
