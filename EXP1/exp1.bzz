@@ -4,7 +4,7 @@ include "vec2.bzz"
 include "../utils.bzz"
 
 # Hyperparameters for the probabilities
-PERCENT_INIT_INFECTED = 30
+PERCENT_INIT_INFECTED = 10
 PERCENT_PROBA_INFECTED = 5
 PERCENT_PROBA_INFECTED_BARRIER = 25
 
@@ -34,12 +34,10 @@ CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 # data files to save
 EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
 EXP_NAME = "test"
-tos = string.tostring
-toi = string.toint
 DATA_FILE = string.concat(
 	"data_",tos(NB_CLUSTERS),
 	"_",tos(toi(tos(SPEED))),
-  "_",tos(MOVE_TYPE),
+    "_",tos(MOVE_TYPE),
 	"_",tos(PERCENT_INIT_INFECTED),
 	"_",tos(PERCENT_PROBA_INFECTED),
 	"_",tos(PERCENT_PROBA_INFECTED_BARRIER),

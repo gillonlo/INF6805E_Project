@@ -34,13 +34,15 @@ CLUSTERS[1] = {.x = 3.0, .y = -3.0}
 CLUSTERS[2] = {.x = -3.0, .y = 3.0}
 CLUSTERS[3] = {.x = -3.0, .y = -3.0}
 
+
+
 # data files to save
 EPIDEMIC_TREE_FILE = "epidemic_tree.csv"
 EXP_NAME = "test"
 DATA_FILE = string.concat(
 	"data_",tos(NB_CLUSTERS),
 	"_",tos(toi(tos(SPEED))),
-  "_",tos(MOVE_TYPE),
+    "_",tos(MOVE_TYPE),
 	"_",tos(PERCENT_INIT_INFECTED),
 	"_",tos(PERCENT_PROBA_INFECTED),
 	"_",tos(PERCENT_PROBA_INFECTED_BARRIER),
@@ -196,7 +198,7 @@ function step() {
 		else{
 			s.exec(random_move)
 		}	
-		s.exec(epidemics_spread)
+		s.exec(edpidemics_spread)
 		save_stats()
 }
 

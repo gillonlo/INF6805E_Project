@@ -4,7 +4,7 @@ import seaborn as sns
 
 def metp2postfix(l):
     if l:
-        return f'{l["n_clusters"]}_{l["speed"]}_{l["move_type"]}_{l["p_i_infected"]}_{l["p_p_infected"]}_{l["p_p_i_barrier"]}'
+        return f'{l["n_clusters"]}_{l["speed"]}_{l["move_type"]}_{l["p_i_infected"]}_{l["p_p_infected"]}_{l["p_p_i_barrier"]}{"_"+str(l.get("t_infectious","")) if l.get("t_infectious",False) else ""}'
     return ""
 
 name2data = lambda x,b:x+"/data_"+metp2postfix(b)+".csv"
@@ -79,19 +79,22 @@ def m_plot_infection_evolution(filename, varying_parameter, list_of_mparam):
     plt.clf()
 
 
-def gen_meta_meta(varying_parameter):
+def gen_meta_meta(varying_parameter,exclusion):
     met={
         "n_clusters":[4],
         "speed":[10],
         "move_type":[1],
         "p_i_infected":[10,20,30],
         "p_p_infected":[5],
-        "p_p_i_barrier":[25]
+        "p_p_i_barrier":[25],
+        "t_infectious":[100,250,500]
     }
     l=[]
     for x in met[varying_parameter]:
         tmp_m = {}
         for k,v in met.items():
+            if k in exclusion:
+                continue
             if k!=varying_parameter:
                 tmp_m[k]=v[0]
             else:
@@ -100,4 +103,5 @@ def gen_meta_meta(varying_parameter):
     return l
     
 
-m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected"))
+#m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",["t_infectious"]))
+m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[]))
