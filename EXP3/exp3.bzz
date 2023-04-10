@@ -6,10 +6,10 @@ include "../utils.bzz"
 # Hyperparameters for the probabilities
 PERCENT_INIT_INFECTED = 10
 PERCENT_PROBA_INFECTED = 5
-PERCENT_PROBA_INFECTED_BARRIER = 25
+PERCENT_PROBA_INFECTED_BARRIER = 75
 
 # Time after which the robot is removed
-TIME_INFECTIOUS = 100
+TIME_INFECTIOUS = 1000
 
 # Possible states of the experiment
 POSSIBLE_STATES = {}

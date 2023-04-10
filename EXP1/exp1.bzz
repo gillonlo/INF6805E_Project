@@ -5,7 +5,7 @@ include "../utils.bzz"
 
 # Hyperparameters for the probabilities
 PERCENT_INIT_INFECTED = 10
-PERCENT_PROBA_INFECTED = 5
+PERCENT_PROBA_INFECTED = 7
 PERCENT_PROBA_INFECTED_BARRIER = 25
 
 # Possible states of the experiment
