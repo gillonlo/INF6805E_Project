@@ -73,7 +73,7 @@ def m_plot_infection_evolution(filename, varying_parameter, list_of_mparam):
         subplot_type = "single_infected_"+metp2postfix(kwargs)
         infected = lazy_load(filename,subplot_type,**kwargs)
     
-        infected["nb_state"][:5000].plot(label=f"{varying_parameter}={kwargs[varying_parameter]}")
+        infected["nb_state"][:10000].plot(label=f"{varying_parameter}={kwargs[varying_parameter]}")
 
     #plt.xscale("log")
     #plt.yscale("log")
@@ -91,7 +91,7 @@ def m_plot_removed_evolution(filename, varying_parameter, list_of_mparam):
         subplot_type = "single_removed_"+metp2postfix(kwargs)
         infected = lazy_load(filename,subplot_type,**kwargs)
     
-        infected["nb_state"][:5000].plot(label=f"{varying_parameter}={kwargs[varying_parameter]}")
+        infected["nb_state"][:10000].plot(label=f"{varying_parameter}={kwargs[varying_parameter]}")
 
 
     #plt.xscale("log")
@@ -110,9 +110,9 @@ def gen_meta_meta(varying_parameter,values,exclusion=[],default={}):
         "move_type":1,
         "p_i_infected":10,
         "p_p_infected":5,
-        "p_p_i_barrier":25,
-        "t_infectious":100,
-        "t_removed":100
+        "p_p_i_barrier":75,
+        "t_infectious":500,
+        "t_removed":250
     }
     l=[]
     for x in values:
@@ -131,4 +131,4 @@ def gen_meta_meta(varying_parameter,values,exclusion=[],default={}):
 #m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",[10,20,30],["t_infectious","t_removed"]))
 #m_plot_infection_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[100,250,500],["t_removed"]))
 #m_plot_removed_evolution("EXP3","t_infectious",gen_meta_meta("t_infectious",[100,250,500],["t_removed"]))
-m_plot_infection_evolution("EXP4","t_removed",gen_meta_meta("t_removed",[100,500],default={"t_infectious":500}))
+m_plot_infection_evolution("EXP4","t_removed",gen_meta_meta("t_removed",[50,100,250,1000]))
