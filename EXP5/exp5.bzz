@@ -6,10 +6,10 @@ include "../utils.bzz"
 # Hyperparameters for the probabilities
 PERCENT_INIT_ZOMBIE = 10
 PERCENT_PROBA_INFECTED = 5
-PERCENT_PROBA_INFECTED_BARRIER = 10
+PERCENT_PROBA_INFECTED_BARRIER = 75
 
 # Life point after which the robot is removed
-LIFE_POINTS_ZOMBIE = 250
+LIFE_POINTS_ZOMBIE = 30
 
 # Possible states of the experiment
 POSSIBLE_STATES = {}
