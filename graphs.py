@@ -147,6 +147,7 @@ def gen_meta_meta(varying_parameter,values,exclusion=[],default={}):
     return l
     
 
+
 ## EXP2
 #m_plot_infection_evolution("EXP2","t_infectious",gen_meta_meta("t_infectious",[100,250,500,1000],["t_removed"]))
 #m_plot_infection_evolution("EXP2","p_p_infected",gen_meta_meta("p_p_infected",[2,5,7,10,25],["t_removed"]))
@@ -168,4 +169,3 @@ m_plot_infection_evolution("EXP5","p_p_infected",gen_meta_meta("p_p_infected",[2
 
 m_plot_infection_evolution("EXP5","p_p_i_barrier",gen_meta_meta("p_p_i_barrier",[25,50,75,100],["t_removed"]))
 #m_plot_infection_evolution("EXP5","p_i_infected",gen_meta_meta("p_i_infected",[5,10,20,30,50],["t_removed"]))
-
