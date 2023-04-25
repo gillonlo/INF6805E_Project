@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 
-EXP_LENGTH=5000
+EXP_LENGTH=5000*2
 
 def metp2postfix(l):
     has = lambda x:("_"+str(l.get(x,"")) if l.get(x,False) else "")
@@ -148,6 +148,12 @@ def gen_meta_meta(varying_parameter,values,exclusion=[],default={}):
         l.append(tmp_m)
     return l
 
+
+"""
+"p_p_i_barrier":75,
+        "t_infectious":500,
+        "t_removed":250
+"""
 ## EXP1
 """
 m_plot_infection_evolution("EXP1","p_p_i_barrier",gen_meta_meta("p_p_i_barrier",[25,50,75,100],["t_infectious","t_removed"]))
@@ -169,8 +175,20 @@ m_plot_infection_evolution("EXP1","p_i_infected",gen_meta_meta("p_i_infected",[1
 # Mixed
 #m_mixed_infection_evolution(["EXP2","EXP3"],[gen_meta_meta("t_infectious",[500],["t_removed"])[0],gen_meta_meta("t_infectious",[500],["t_removed"])[0]])
 
+## EXP4
+dflt = {
+    "p_p_i_barrier":75,
+    "t_infectious":500,
+    "t_removed":250
+}
+m_plot_infection_evolution("EXP4","t_infectious",gen_meta_meta("t_infectious",[100,250,500,1000],default=dflt))
+m_plot_infection_evolution("EXP4","p_p_i_barrier",gen_meta_meta("p_p_i_barrier",[25,50,75,100],default=dflt))
+m_plot_infection_evolution("EXP4","p_p_infected",gen_meta_meta("p_p_infected",[2,5,7,10,25],default=dflt))
+m_plot_infection_evolution("EXP4","t_removed",gen_meta_meta("t_removed",[50,100,250,500,1000],default=dflt))
+
+
 # EXP5
 #m_plot_infection_evolution("EXP5","t_infectious",gen_meta_meta("t_infectious",[100,250,500,1000],["t_removed"]))
 #m_plot_infection_evolution("EXP5","p_p_infected",gen_meta_meta("p_p_infected",[2,5,7,10,25],["t_removed"]))
-m_plot_infection_evolution("EXP5","p_p_i_barrier",gen_meta_meta("p_p_i_barrier",[10,25,50,75],["t_removed"]))
+#m_plot_infection_evolution("EXP5","p_p_i_barrier",gen_meta_meta("p_p_i_barrier",[10,25,50,75],["t_removed"]))
 #m_plot_infection_evolution("EXP5","p_i_infected",gen_meta_meta("p_i_infected",[5,10,20,30,50],["t_removed"]))
